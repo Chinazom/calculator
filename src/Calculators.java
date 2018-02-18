@@ -10,54 +10,42 @@ import java.awt.Color;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
+import java.util.Arrays;
+
 import javax.swing.*;
 import java.awt.BorderLayout;
 
 public class Calculators extends JFrame {
-	
-	
-	
-
 	private static final long serialVersionUID = 1L;
-	
-
-
 public static void main (String[]args) {
-	
-	// create the frame and set the frame properties
+		// create the frame and set the frame properties
 	JFrame calculatorFrame = new JFrame();
 	 calculatorFrame.setTitle("Calculator");
-	 calculatorFrame.setSize(600, 150);
+	 calculatorFrame.setSize(600, 350);
 	 calculatorFrame.setLocation(200,100);
 	 calculatorFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	 calculatorFrame.setVisible(true);
 	 calculatorFrame.setBackground(Color.DARK_GRAY);
 	 
-	 
+	
 	 
 	 // creates five panels and add the panel to a parent panel
 	 JPanel calculatorPanel = new JPanel ();
 	 JPanel displayPanel = new JPanel ();
-	 JTextField display = new JTextField();
-	display.addActionListener(new ActionListener()
-     {
-         public void actionPerformed(ActionEvent evt)
-         {
-             String val = ((JButton)evt.getSource()).getText();
-             display.setText(display.getText()+val);
-         }
-     });
-	 
-	 
+	//where initialization occurs:
+	 JTextArea display = new JTextArea(5,5);
+	 display.setColumns(50);
+	String R = display.getText();
 	 displayPanel.add(display);
 	 
 	 //String text=display.getText().toString();
-	 //System.out.println(text);
+	 //System.out.println(R);
 	 
 	 
-	 displayPanel.setLayout(new GridLayout(5, 2));
+	// displayPanel.setLayout(new GridLayout(5, 1));
 	 JPanel numberPanel = new JPanel ();
-	 numberPanel.setSize(1000,300);
+	 numberPanel.setSize(200,300);
 	 numberPanel.setLayout(new GridLayout(4, 3));
 	 JPanel mathsPanel = new JPanel ();
 	 mathsPanel.setLayout(new GridLayout(5, 2));
@@ -70,10 +58,6 @@ public static void main (String[]args) {
 	 calculatorPanel.add(symbolPanel, BorderLayout.WEST);
 	 ButtonGroup buttons = new ButtonGroup();
 	 
-	 
-	 
-	
-	
 	
 	// Add buttons to the number panel and get the string value
 		  for (int i = 1; i <= 9; i++) {
@@ -91,7 +75,6 @@ public static void main (String[]args) {
 			         }
 			     });
 		  }
-		  
 		 JButton zero = new JButton("" + 0);
 		 zero.addActionListener(new ActionListener()
 	     {
@@ -101,6 +84,80 @@ public static void main (String[]args) {
 	            display.setText(display.getText()+val);
 	         }
 	     });
+		 JButton equalTo = new JButton("=");
+		  symbolPanel.add(equalTo);
+		  equalTo.addActionListener(new ActionListener()
+		     {
+		         public void actionPerformed(ActionEvent evt)
+		         {
+		             String val = (display.getText());
+		             display.setText("");
+		             System.out.println (val);
+		             
+		             String input = val;
+		             String[] operators =input.split("[a-zA-Z_0-9]");
+		             //String[] plus =input.split("[a-zA-Z_0-9-*/]");
+		             //String[] mul =input.split("[a-zA-Z_0-9-+/]");
+		             String[] num =input.split("[^a-zA-Z_0-9]");
+
+		             Double[] numval = new Double[num.length];
+		             //String[] opval;
+
+		             ArrayList<String> ops = new ArrayList<>(Arrays.asList(operators));
+
+		             for (int i= 0; i < num.length; i++ ) {
+		             numval[i]= Double.parseDouble(num[i]);
+		             System.out.println(num[i]);
+		             System.out.println(operators[i]);
+		             }
+
+		             ArrayList<Double> numva = new ArrayList<>(Arrays.asList(numval));
+		             System.out.println((numva));
+		             System.out.println((ops));
+		             System.out.println(val);
+		             double result = 0;
+
+
+		             while(ops.indexOf("*")!=-1){
+		                 int ind = ops.indexOf("*");
+		                 ops.remove(ind);
+		              result = (numva.get(ind-1) * numva.get(ind));
+		             numva.set(ind, result);
+		             numva.remove(ind-1);
+
+		             }
+
+		             while(ops.indexOf("+")!=-1){
+		                 int ind = ops.indexOf("+");
+		                 ops.remove(ind);
+		              result = (numva.get(ind-1) + numva.get(ind));
+		             numva.set(ind, result);
+		             numva.remove(ind-1);
+
+		             }
+		             while(ops.indexOf("-")!=-1){
+		                 int ind = ops.indexOf("-");
+		                 ops.remove(ind);
+		              result = (numva.get(ind-1) - numva.get(ind));
+		             numva.set(ind, result);
+		             numva.remove(ind-1);
+
+		             }
+
+		             while(ops.indexOf("/")!=-1){
+		                 int ind = ops.indexOf("/");
+		                 ops.remove(ind);
+		              result = (numva.get(ind-1) / numva.get(ind));
+		             numva.set(ind, result);
+		             numva.remove(ind-1);
+
+		             }
+		             display.setText(Double.toString(result));
+		             System.out.println(result);
+		             
+		         }
+		     });
+			  
 		 JButton point = new JButton(".");
 		point.addActionListener(new ActionListener()
 	     {
@@ -109,6 +166,11 @@ public static void main (String[]args) {
 	        	
 	             String val = ((JButton)evt.getSource()).getText();
 	             display.setText(display.getText()+val);
+	             point.setEnabled(false);
+	            
+	             /*if (evt.getSource() == equalTo) {
+	            	 point.setEnabled(true);
+	             }**/
 	         }
 	     });
 		 JButton C =new JButton("C");
@@ -117,6 +179,8 @@ public static void main (String[]args) {
 	         public void actionPerformed(ActionEvent evt)
 	         {
 	        	display.setText("");
+	        	SwingUtilities.updateComponentTreeUI(calculatorFrame);
+	        	calculatorFrame.repaint();
 	         }
 	     });
 		 
@@ -136,6 +200,8 @@ public static void main (String[]args) {
 		        	
 		             String val = ((JButton)evt.getSource()).getText();
 		             display.setText(display.getText()+val);
+		             String s = evt.getActionCommand();
+		             System.out.println(s);
 		         }
 		     });
 		  symbolPanel.add(division);
@@ -191,23 +257,46 @@ public static void main (String[]args) {
 		     {
 		         public void actionPerformed(ActionEvent evt)
 		         {
+		        if (evt.getSource() == addition) {
+		        	  String val = ((JButton)evt.getSource()).getText();
+		        	  String vall = display.getText();	
+		        	  display.setText(vall + val);
+		        	  //System.out.println(val);
+	            
+		        	  String[] valueinArray =  vall.split("\\+");
+		        	  
+		        	  //System.out.println(vall + valueinArray.length);
+		       /* for (int i = 0; i < valueinArray.length; i++) {
+	            	 //System.out.print(valueinArray[i] + " ");
 		        	
-		             String val = ((JButton)evt.getSource()).getText();
-		             display.setText(display.getText()+val);
-		         }
-		     });
-		  JButton equalTo = new JButton("=");
-		  symbolPanel.add(equalTo);
-		  equalTo.addActionListener(new ActionListener()
-		     {
-		         public void actionPerformed(ActionEvent evt)
-		         {
-		             String val = (display.getText());
-		             display.setText("");
-		             System.out.println (val);
-		         }
-		     });
+	            	 double valll= Double.parseDouble(valueinArray[i]);
+	            	 System.out.println(valll);
+	            	 	 
+	            	
+	            	 }**/
+		        	  /*double [] numbers = new double[valueinArray.length];
+		              for(int i = 0; i < valueinArray.length; i++){
+		                  numbers[i] = Double.parseDouble(valueinArray[i]);
+		                
+		                  //System.out.println(numbers[i]);
+		                  }	
 			  
+		       double value = 0;
+	              for(int i = 0; i < valueinArray.length; i++){
+	                   value += numbers[i];
+	                
+	                 }	
+	              System.out.println(value); */
+		  }
+		        
+		        
+		         }
+		     });
+		  /*if (!display.getText().isEmpty()) {
+			  double value = Double.parseDouble(display.getText());
+			  System.out.println(value);
+			 **/
+		  
 		  JButton Sin = new JButton ("sin");
 		  JButton ln = new JButton ("ln");
 		  JButton cos = new JButton ("cos");
@@ -230,6 +319,8 @@ public static void main (String[]args) {
 		  mathsPanel.add(factoria);
 		  mathsPanel.add(squareroot); 
 		  calculatorFrame.add(calculatorPanel);
+		 
+		 
 	}
 }
 
